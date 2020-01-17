@@ -4,6 +4,10 @@ cage is a simple, modern and secure file encryption tool.
 
 It features small explicit keys, no config options, and UNIX-style composability. This is a C89 compliant implementation of the age spec.
 
+# UNDER CONSTRUCTION
+
+currently only the `cage-keygen` is available, this will change soon:tm:.
+
 ```
 $ cage-keygen -o key.txt
 Public key: cage1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p
