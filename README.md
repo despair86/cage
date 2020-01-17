@@ -117,5 +117,5 @@ On all supported versions of FreeBSD, you can build the security/cage port or us
 pkg install cage
 ```
 -->
-Help from new packcagers is very welcome.
+This implementation of the age v1 spec in C is issued under the terms of the zlib-libpng licence.
 
