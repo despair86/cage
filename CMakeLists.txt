@@ -23,6 +23,8 @@ file(GLOB_RECURSE polarssl_sources src/crypto/*.c)
 # The data is just added to the executable, because in some IDEs (QtCreator)
 # files are invisible when they are not explicitly part of the project.
 add_executable(cage-keygen ${keygen_sources})
+
+# this library is not installed with the apps.
 add_library(cage-crypto STATIC ${polarssl_sources} ${bech32_sources} ${common_sources})
 
 # Just for cage-keygen add some compiler flags.
@@ -45,7 +47,7 @@ target_link_libraries(cage-keygen cage-crypto)
 
 # All install commands get the same destination. this allows us to use paths
 # relative to the executable.
-#install(TARGETS cage-keygen DESTINATION whatever)
+install(TARGETS cage-keygen DESTINATION bin)
 
 # Now comes everything we need, to create a package
 # there are a lot more variables you can set, and some

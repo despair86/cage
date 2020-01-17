@@ -29,24 +29,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #ifdef _MSC_VER
 #include "getopt_win32.h"
 #else
 #include <getopt.h>
 #endif
 
-/* age HRPs */
+/* age HRPs and date formatting */
 static const char* age_secret_hrp = "AGE-SECRET-KEY-";
 static const char* age_hrp = "age";
+static const char* date_fmt = "%Y-%m-%dT%H:%M:%SZ";
+
+static void generate();
 
 main(argc, argv)
 char** argv;
 {
 	int option_index, c;
 	char* filename;
+	FILE* output;
 
 	option_index = c = 0;
 	filename = NULL;
+	output = stdout;
 	while (1)
 	{
 		static struct option long_options[] =
@@ -55,10 +61,13 @@ char** argv;
 			{0,0,0,0}
 		};
 
-		c = getopt_long(argc, argv, "?ho:",
-						long_options, &option_index);
-		if (c == -1)
-			break;
+		c = getopt_long(argc, argv, "o:h", long_options, &option_index);
+		if (c == -1 && argc > 1)
+		{
+bad:
+			fprintf(stderr, "cage-keygen takes no arguments\n");
+			return -1;
+		}
 
 		switch (c)
 		{
@@ -66,16 +75,55 @@ char** argv;
 			filename = strdup(optarg);
 			break;
 		case 'h':
-		/* fall through */
-		case '?':
 			printf("usage: %s -o filename (default: stdout)\n", argv[0]);
 			return 1;
+		case '?':
+			goto bad;
 		default:
 			break;
 		}
+		break;
 	}
 
 	if (filename)
+	{
+		output = fopen(filename, "w");
+		if (!output)
+		{
+			fprintf(stderr, "Failed to open %s for writing!\n", filename);
+			free(filename);
+			return -1;
+		}
+	}
+
+	generate(output);
+
+	if (filename)
+	{
 		free(filename);
+		fclose(output);
+	}
 	return (EXIT_SUCCESS);
+}
+
+static void generate(out)
+FILE* out;
+{
+#ifdef _WIN32
+	__time64_t now;
+#else
+	time_t now;
+#endif
+	struct tm* tinfo;
+	char tstring[128];
+
+#ifdef _WIN32
+	time64(&now);
+	tinfo = gmtime64(&now);
+#else
+	time(&now);
+	tinfo = gmtime(&now);
+#endif
+	strftime(tstring, 128, date_fmt, tinfo);
+	fprintf(out, "# created: %s\n", tstring);
 }
