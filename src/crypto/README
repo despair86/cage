@@ -1,0 +1,2 @@
+The whole mbedTLS distribution is imported here, but will eventually be pruned as we identify unused algorithms.
+-rick
