@@ -35,6 +35,10 @@
 #include <getopt.h>
 #endif
 
+/* age HRPs */
+static const char* age_secret_hrp = "AGE-SECRET-KEY-";
+static const char* age_hrp = "age";
+
 main(argc, argv)
 char** argv;
 {
