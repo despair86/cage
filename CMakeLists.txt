@@ -25,7 +25,7 @@ file(GLOB_RECURSE polarssl_sources src/crypto/*.c)
 add_executable(cage-keygen ${keygen_sources})
 
 # this library is not installed with the apps.
-add_library(cage-crypto STATIC ${polarssl_sources} ${bech32_sources} ${common_sources})
+add_library(cage-crypto OBJECT ${polarssl_sources} ${bech32_sources} ${common_sources})
 
 # Just for cage-keygen add some compiler flags.
 #target_compile_options(cage-keygen PUBLIC)
@@ -35,7 +35,7 @@ target_include_directories(cage-keygen PUBLIC include)
 target_include_directories(cage-crypto PUBLIC include)
 
 # link polarssl for crypto (we have x25519 here!)
-target_link_libraries(cage-keygen cage-crypto)
+target_link_libraries(cage-keygen $<TARGET_OBJECTS:cage-crypto>)
 
 # This copies all resource files in the build directory.
 # We need this, because we want to work with paths relative to the executable.
