@@ -22,7 +22,7 @@
 #ifndef _SEGWIT_ADDR_H_
 #define _SEGWIT_ADDR_H_ 1
 
-#ifdef _MSC_VER
+#if _MSC_VER && (_MSC_VER < 1600)
 #include "stdint_msvc.h"
 #else
 #include <stdint.h>
