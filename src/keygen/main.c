@@ -240,9 +240,11 @@ static ec_key_pair *generate_identity()
 		abort();
 	}
 	r = mbedtls_ctr_drbg_random(&drbg_ctx, out->secret, 32);
+#if 0
 	out->secret[0] &= 248;
 	out->secret[31] &= 127;
 	out->secret[31] |= 64;
+#endif
 	crypto_scalarmult_curve25519(out->public, out->secret, basepoint);
 
 	return out;
