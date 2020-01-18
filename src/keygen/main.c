@@ -29,19 +29,71 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include <time.h>
+#include <ctype.h>
+
 #ifdef _MSC_VER
 #include "getopt_win32.h"
+#include "stdint_msvc.h"
+#include <malloc.h>
 #else
+#include <stdint.h>
 #include <getopt.h>
 #endif
+
+#if defined(__sun)
+#include <alloca.h>
+#endif
+
+#include <mbedtls/config.h>
+#include <mbedtls/entropy.h>
+#include <mbedtls/ctr_drbg.h>
+#include <nacl.h>
+#include <bech32.h>
+#include <mbedtls/platform_util.h>
 
 /* age HRPs and date formatting */
 static const char* age_secret_hrp = "AGE-SECRET-KEY-";
 static const char* age_hrp = "age";
 static const char* date_fmt = "%Y-%m-%dT%H:%M:%SZ";
 
+/* X25519 base point */
+static const unsigned char basepoint[32] = {9};
+
+/* RNG */
+static mbedtls_ctr_drbg_context drbg_ctx;
+static mbedtls_entropy_context rnd_ctx;
+
+/* is the RNG ready? */
+static int rand_active = 0;
+
+/* A so-called "device specific id" to seed the internal RNG */
+static const unsigned char* APP_SEED_RNG = "cage-v1-default-seed";
+
+typedef struct ec_key_pair
+{
+	uint8_t secret[32];
+	uint8_t public[32];
+} ec_key_pair;
+
+/* internal functions */
 static void generate();
+static ec_key_pair *generate_identity();
+
+void init_rand()
+{
+	int r;
+	mbedtls_ctr_drbg_init(&drbg_ctx);
+	mbedtls_entropy_init(&rnd_ctx);
+	r = mbedtls_ctr_drbg_seed(&drbg_ctx, mbedtls_entropy_func, &rnd_ctx, APP_SEED_RNG, strlen((char*)APP_SEED_RNG));
+	if (r)
+	{
+		fprintf(stderr, "failed to seed RNG!\n");
+		abort();
+	}
+	rand_active = 1;
+}
 
 main(argc, argv)
 char** argv;
@@ -53,6 +105,7 @@ char** argv;
 	option_index = c = 0;
 	filename = NULL;
 	output = stdout;
+	init_rand();
 	while (1)
 	{
 		static struct option long_options[] =
@@ -103,6 +156,8 @@ bad:
 		free(filename);
 		fclose(output);
 	}
+	mbedtls_ctr_drbg_free(&drbg_ctx);
+	mbedtls_entropy_free(&rnd_ctx);
 	return (EXIT_SUCCESS);
 }
 
@@ -116,14 +171,75 @@ FILE* out;
 #endif
 	struct tm* tinfo;
 	char tstring[128];
+	ec_key_pair* kp;
+	int r;
+	char c;
+	char* bech32_secret, *bech32_public;
 
 #ifdef _WIN32
-	time64(&now);
-	tinfo = gmtime64(&now);
+	_time64(&now);
+	tinfo = _gmtime64(&now);
 #else
 	time(&now);
 	tinfo = gmtime(&now);
 #endif
 	strftime(tstring, 128, date_fmt, tinfo);
+	kp = generate_identity();
+
+	bech32_secret = alloca(strlen(age_secret_hrp) + 60);
+	bech32_public = alloca(strlen(age_hrp) + 60);
+	age_key_encode(bech32_secret, age_secret_hrp, kp->secret, 32);
+	age_key_encode(bech32_public, age_hrp, kp->public, 32);
+
+	r=0;
+	while(bech32_secret[r])
+	{
+		c = bech32_secret[r];
+		if (!isdigit(c))
+			bech32_secret[r] = toupper(c);
+		r++;
+	}
+
 	fprintf(out, "# created: %s\n", tstring);
+	fprintf(out, "# public key: %s\n", bech32_public);
+	fprintf(out, "%s\n", bech32_secret);
+	if ((out != stdout) || !isatty(fileno(stdout)))
+		fprintf(stderr, "Public key: %s\n", bech32_public);
+
+	/* scrub everything */
+	mbedtls_platform_zeroize(bech32_public, strlen(age_hrp)+60);
+	mbedtls_platform_zeroize(bech32_secret, strlen(age_secret_hrp)+60);
+	mbedtls_platform_zeroize(kp->secret, 32);
+	mbedtls_platform_zeroize(kp->public, 32);
+
+	free(kp);
 }
+
+static ec_key_pair *generate_identity()
+{
+	ec_key_pair* out;
+	int r;
+
+	r = 0;
+	out = NULL;
+	out = malloc(sizeof(ec_key_pair));
+	if (!out)
+	{
+		fprintf(stderr, "out of memory!\n");
+		abort();
+	}
+	r = mbedtls_ctr_drbg_random(&drbg_ctx, out->secret, 32);
+	out->secret[0] &= 248;
+	out->secret[31] &= 127;
+	out->secret[31] |= 64;
+	crypto_scalarmult_curve25519(out->public, out->secret, basepoint);
+
+	return out;
+}
+
+/* we need this for any kind of libsodium implementation */
+void randombytes(uint8_t* data, uint64_t l)
+{
+	mbedtls_ctr_drbg_random(&drbg_ctx, data, l);
+}
+
