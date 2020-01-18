@@ -81,6 +81,7 @@ static int rand_active = 0;
 /* A so-called "device specific id" to seed the internal RNG */
 static const unsigned char* APP_SEED_RNG = "cage-v1-default-seed";
 
+/* our EC key pair. MUST be scrubbed before exit */
 typedef struct ec_key_pair
 {
 	uint8_t secret[32];

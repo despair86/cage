@@ -24,8 +24,22 @@ file(GLOB_RECURSE polarssl_sources src/crypto/*.c)
 # files are invisible when they are not explicitly part of the project.
 add_executable(cage-keygen ${keygen_sources})
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
+  set(SOLARIS ON)
+  #set(CMAKE_C_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -lsocket -lnsl")
+  IF(CMAKE_C_COMPILER_ID MATCHES "SunPro")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mt")
+  ELSE()
+    add_definitions(-D_POSIX_PTHREAD_SEMANTICS -D_REENTRANT)
+  ENDIF()
+endif()
+
 # this library is not installed with the apps.
+if (NOT SOLARIS AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
 add_library(cage-crypto OBJECT ${polarssl_sources} ${bech32_sources} ${common_sources})
+else()
+add_library(cage-crypto STATIC ${polarssl_sources} ${bech32_sources} ${common_sources})
+endif()
 
 # Just for cage-keygen add some compiler flags.
 #target_compile_options(cage-keygen PUBLIC)
@@ -35,7 +49,11 @@ target_include_directories(cage-keygen PUBLIC include)
 target_include_directories(cage-crypto PUBLIC include)
 
 # link polarssl for crypto (we have x25519 here!)
+if (NOT SOLARIS AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
 target_link_libraries(cage-keygen $<TARGET_OBJECTS:cage-crypto>)
+else()
+target_link_libraries(cage-keygen cage-crypto)
+endif()
 
 # This copies all resource files in the build directory.
 # We need this, because we want to work with paths relative to the executable.

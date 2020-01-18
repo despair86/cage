@@ -1,2 +1,7 @@
 The whole mbedTLS distribution is imported here, but will eventually be pruned as we identify unused algorithms.
+The Windows build, using GCC 8.3 with LTO and function-level linking enabled (-f*-sections, -Wl,--gc-sections),
+actually strips out all of the unused code - not even Winsock is linked into the final image after the LTO pass.
+
+Other platforms do not seem to be nearly as aggressive - GCC 9.2 on Solaris 11 still manages to pull in libsocket
+and the resolver library libnsl.
 -rick
