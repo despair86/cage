@@ -37,9 +37,11 @@
 #include "getopt_win32.h"
 #include "stdint_msvc.h"
 #include <malloc.h>
+#include <io.h>
 #else
 #include <stdint.h>
 #include <getopt.h>
+#include <unistd.h>
 #endif
 
 #if defined(__sun)
