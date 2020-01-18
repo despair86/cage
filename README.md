@@ -10,8 +10,8 @@ currently only the `cage-keygen` is available, this will change soon:tm:.
 
 ```
 $ cage-keygen -o key.txt
-Public key: cage1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p
-$ tar cvz ~/data | cage -r cage1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p > data.tar.gz.age
+Public key: age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p
+$ tar cvz ~/data | cage -r age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p > data.tar.gz.age
 $ cage -d -i key.txt data.tar.gz.age > data.tar.gz
 ```
 
@@ -51,7 +51,7 @@ Multiple keys can be provided, and any unused ones will be ignored.
 Files can be encrypted to multiple recipients by repeating `-r/--recipient`. Every recipient will be able to decrypt the file.
 
 ```
-$ cage -o example.jpg.age -r cage1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p \
+$ cage -o example.jpg.age -r age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p \
     -r age1lggyhqrw2nlhcxprm67z43rta597azn8gknawjehu9d9dl0jq3yqqvfafg example.jpg
 ```
 
