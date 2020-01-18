@@ -50,7 +50,7 @@ int mbedtls_padlock_has_support( int feature )
 {
     static int flags = -1;
     int ebx = 0, edx = 0;
-#ifndef __SUNPRO_C
+
     if( flags == -1 )
     {
         asm( "movl  %%ebx, %0           \n\t"
@@ -70,7 +70,6 @@ int mbedtls_padlock_has_support( int feature )
 
         flags = edx;
     }
-#endif
 
     return( flags & feature );
 }
