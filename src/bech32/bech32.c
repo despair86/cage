@@ -69,8 +69,8 @@ size_t data_len;
 		if (ch < 33 || ch > 126)
 			return 0;
 
-		/* Do not check for case, we always pass single-case here */
-		/*if (ch >= 'a' && ch <= 'z') return 0;*/
+		/* HRP must be lowercase! We can convert to uppercase afterward. */
+		if (ch >= 'A' && ch <= 'Z') return 0;
 		chk = bech32_polymod_step(chk) ^ (ch >> 5);
 		++i;
 	}

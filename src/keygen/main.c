@@ -60,7 +60,11 @@
 #include <mbedtls/platform_util.h>
 
 /* age HRPs and date formatting */
-static const char* age_secret_hrp = "AGE-SECRET-KEY-";
+/* the private key HRP is emitted as lowercase since the bech32
+ * function operates entirely on the lowercase string. We convert it
+ * back to uppercase at the end.
+ */
+static const char* age_secret_hrp = "age-secret-key-";
 static const char* age_hrp = "age";
 static const char* date_fmt = "%Y-%m-%dT%H:%M:%SZ";
 
