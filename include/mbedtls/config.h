@@ -58,7 +58,10 @@
  *
  * Comment to disable the use of assembly code.
  */
+#if (defined(__GNUC__) && defined(__sse2__)) || \
+    (defined(__SUNPRO_C) && (defined(__i386__) || defined(__amd64__)))
 #define MBEDTLS_HAVE_ASM
+#endif
 
 /**
  * \def MBEDTLS_NO_UDBL_DIVISION
@@ -117,7 +120,8 @@
  *
  * Uncomment if the CPU supports SSE2 (IA-32 specific).
  */
-#if defined(__i386__) || defined(__amd64__) || defined(_M_X86) || defined(_M_X64)
+#if (defined(__GNUC__) && defined(__sse2__)) || \
+    (defined(__SUNPRO_C) && (defined(__i386__) || defined(__amd64__)))
 #define MBEDTLS_HAVE_SSE2
 #define MBEDTLS_HAVE_X86_64
 #endif
@@ -1810,7 +1814,7 @@
  *
  * This modules adds support for the AES-NI instructions on x86-64
  */
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && defined(MBEDTLS_HAVE_ASM)
 #define MBEDTLS_AESNI_C
 #endif
 
@@ -2552,7 +2556,9 @@
  *
  * This modules adds support for the VIA PadLock on x86.
  */
+#if defined(MBEDTLS_HAVE_ASM)
 #define MBEDTLS_PADLOCK_C
+#endif
 
 /**
  * \def MBEDTLS_PEM_PARSE_C
