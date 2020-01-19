@@ -181,11 +181,9 @@ FILE* out;
 	time_t now;
 #endif
 	struct tm* tinfo;
-	char tstring[128];
+	char tstring[128], c, *bech32_secret, *bech32_public;
 	ec_key_pair* kp;
 	int r;
-	char c;
-	char* bech32_secret, *bech32_public;
 
 #ifdef _WIN32
 	_time64(&now);
