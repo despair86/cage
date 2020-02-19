@@ -102,9 +102,6 @@ size_t dsize;
 
 	return(dlen + (src - osrc));	/* count does not include NUL */
 }
-#endif
-#endif
-
 #ifdef _MSC_VER
 /*-
  * Copyright (c) 1998 Softweyr LLC.  All rights reserved.
@@ -158,8 +155,8 @@ size_t dsize;
 
 char *
 strtok_r(s, delim, last)
-char* __restrict s, __restrict **last;
-const char* __restrict delim;
+char* s, **last;
+const char* delim;
 {
     char *spanp, *tok;
     int c, sc;
@@ -209,4 +206,7 @@ cont:
     }
     /* NOTREACHED */
 }
+#endif
+
+#endif
 #endif
