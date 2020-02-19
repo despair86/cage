@@ -12,6 +12,7 @@ file(GLOB_RECURSE keygen_sources   src/keygen/*.c)
 file(GLOB_RECURSE bech32_sources   src/bech32/*.c)
 file(GLOB_RECURSE common_sources   src/common/*.c)
 file(GLOB_RECURSE polarssl_sources src/crypto/*.c)
+file(GLOB_RECURSE cage_sources     src/cage/*.c)
 
 # You can use set(sources src/main.cpp) etc if you don't want to
 # use globbing to find files automatically.
@@ -23,6 +24,7 @@ file(GLOB_RECURSE polarssl_sources src/crypto/*.c)
 # The data is just added to the executable, because in some IDEs (QtCreator)
 # files are invisible when they are not explicitly part of the project.
 add_executable(cage-keygen ${keygen_sources})
+add_executable(cage ${cage_sources})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
   set(SOLARIS ON)
@@ -32,6 +34,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
   ELSE()
     add_definitions(-D_POSIX_PTHREAD_SEMANTICS -D_REENTRANT)
   ENDIF()
+  set(CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES} -lsocket -lnsl")
 endif()
 
 # this library is not installed with the apps.
@@ -43,9 +46,11 @@ add_library(cage-crypto STATIC ${polarssl_sources} ${bech32_sources} ${common_so
 # This allows to include files relative to the root of the src directory with a <> pair
 target_include_directories(cage-keygen PUBLIC include)
 target_include_directories(cage-crypto PUBLIC include)
+target_include_directories(cage PUBLIC include)
 
 # link polarssl for crypto (we have x25519 here!)
 target_link_libraries(cage-keygen cage-crypto)
+target_link_libraries(cage cage-crypto)
 
 # This copies all resource files in the build directory.
 # We need this, because we want to work with paths relative to the executable.
@@ -58,6 +63,7 @@ target_link_libraries(cage-keygen cage-crypto)
 # All install commands get the same destination. this allows us to use paths
 # relative to the executable.
 install(TARGETS cage-keygen DESTINATION bin)
+install(TARGETS cage DESTINATION bin)
 
 # Now comes everything we need, to create a package
 # there are a lot more variables you can set, and some
