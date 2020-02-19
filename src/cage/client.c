@@ -72,9 +72,9 @@ unsigned char* ca_certs = NULL;
  * the code is indeed built outside the US.
  */
 #ifdef _EXPORT_BUILD
-static char userAgent[] = "Loki_Pager/0.1 PolarSSL/" MBEDTLS_VERSION_STRING "; I; ";
+static char userAgent[] = "cage/0.1 PolarSSL/" MBEDTLS_VERSION_STRING "; I; ";
 #else
-static char userAgent[] = "Loki_Pager/0.1 PolarSSL/" MBEDTLS_VERSION_STRING "; U; ";
+static char userAgent[] = "cage/0.1 PolarSSL/" MBEDTLS_VERSION_STRING "; U; ";
 #endif
 
 typedef struct url_parser_url
@@ -86,7 +86,7 @@ typedef struct url_parser_url
 	char* query_string;
 } url_parser_url_t;
 
-static const char* seed = "Loki Pager HTTPS client";
+static const char* seed = "cage HTTPS client";
 
 /* If this fails, do NOT use the HTTP client */
 
