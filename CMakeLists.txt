@@ -37,6 +37,14 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
   set(CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES} -lsocket -lnsl")
 endif()
 
+if(MSVC)
+  add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+  if(MSVC_VERSION LESS 1900)
+    add_definitions(-Dsnprintf=_snprintf)
+  endif()
+  include_directories(include/msvc)
+endif()
+
 # this library is not installed with the apps.
 add_library(cage-crypto STATIC ${polarssl_sources} ${bech32_sources} ${common_sources})
 
