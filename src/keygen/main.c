@@ -37,11 +37,7 @@
 #include "getopt_win32.h"
 #include <malloc.h>
 #include <io.h>
-#if _MSC_VER < 1600
-#include "stdint_msvc.h"
-#else
 #include <stdint.h>
-#endif
 #else
 #include <stdint.h>
 #include <getopt.h>
